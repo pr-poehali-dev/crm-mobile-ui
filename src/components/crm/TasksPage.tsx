@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import NewTaskSheet from "./NewTaskSheet";
 
 const FILTERS = ["Все", "Срочные", "Сегодня", "Завтра", "Завершены"];
 
@@ -30,9 +31,17 @@ const PRIORITY_COLOR: Record<string, string> = {
 export default function TasksPage() {
   const [filter, setFilter] = useState("Все");
   const [tasks, setTasks] = useState(TASKS);
+  const [showNewTask, setShowNewTask] = useState(false);
 
   const toggle = (id: number) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  const handleSave = (task: { title: string; desc: string; html: string; time: string; priority: string; tag: string }) => {
+    setTasks(prev => [
+      { id: Date.now(), ...task, done: false },
+      ...prev,
+    ]);
   };
 
   return (
@@ -122,10 +131,20 @@ export default function TasksPage() {
       </div>
 
       {/* Add Button */}
-      <button className="mt-4 w-full gradient-primary text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 neon-glow-purple active:scale-95 transition-all">
+      <button
+        onClick={() => setShowNewTask(true)}
+        className="mt-4 w-full gradient-primary text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 neon-glow-purple active:scale-95 transition-all"
+      >
         <Icon name="Plus" size={18} />
         Новая задача
       </button>
+
+      {showNewTask && (
+        <NewTaskSheet
+          onClose={() => setShowNewTask(false)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }
